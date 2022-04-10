@@ -18,8 +18,8 @@ app.get('/game', (req, res) => {
 });
 
 
-server.listen(80, () => {
-  console.log('listening on *:80');
+server.listen(3000, () => {
+  console.log('listening on *:3000');
 });
 
 let characters = [];
