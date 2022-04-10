@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="ru">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>Online Story Game</title>
+    <meta name="description" content="Online Story Game">
+    <meta name="author" content="kxo">
+
+    <meta property="og:title" content="Online Story Game">
+    <meta property="og:type" content="website">
+    <meta property="og:description" content="Online Story Game">
+
+</head>
+
+<body>
+
+<div style="text-align: center">
+    <h2>Роль:</h2>
+    <input type="radio" id="role_type_narrator"
+       name="role" value="role_type_narrator" checked
+           onclick="document.getElementById('character_profile').style.display = 'none';"
+    >
+    <label for="role_type_narrator">Диктор</label>
+
+    <input type="radio" id="role_type_character"
+       name="role" value="role_type_character"
+       onclick="document.getElementById('character_profile').style.display = 'block';"
+
+    >
+    <label for="role_type_character">Персонаж</label>
+
+    <div id="character_profile" style="display: none">
+        <br/>
+        <label for="name">Имя персонажа: </label><br/>
+        <input id="name" />
+        <br/>
+        <br/>
+        <label for="description">Описание персонажа: </label><br/>
+        <textarea id="description"></textarea>
+    </div>
+    <br/>    <br/>
+    <button onclick="startGame()">Играть</button>
+</div>
+<script>
+    function startGame(){
+        localStorage = window.localStorage;
+        if(!document.getElementById('role_type_narrator').checked) {
+            let name = document.getElementById('name').value;
+            let description = document.getElementById('description').value;
+            localStorage.setItem('name',name);
+            localStorage.setItem('description',description)
+            localStorage.setItem('role', 'character')
+        } else {
+            localStorage.removeItem('name');
+            localStorage.removeItem('description');
+            localStorage.setItem('role', 'narrator')
+        }
+        document.location.href = '/game'
+    }
+    window.onload = function() {
+        localStorage = window.localStorage;
+        document.getElementById('name').value = localStorage.getItem('name');
+        document.getElementById('description').value = localStorage.getItem('description');
+    };
+
+</script>
+
+<!-- your content here... -->
+<!--<script src="js/scripts.js"></script>-->
+</body>
+</html>

@@ -1,0 +1,139 @@
+<!doctype html>
+<html lang="ru">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>Online Story Game</title>
+    <meta name="description" content="Online Story Game">
+    <meta name="author" content="kxo">
+
+    <meta property="og:title" content="Online Story Game">
+    <meta property="og:type" content="website">
+    <meta property="og:description" content="Online Story Game">
+    <style>
+        body { margin: 0; padding-bottom: 3rem; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+
+        #form { background: rgba(0, 0, 0, 0.15); padding: 0.25rem; position: fixed; bottom: 0; left: 0; right: 0; display: flex; height: 3rem; box-sizing: border-box; backdrop-filter: blur(10px); }
+        #input { border: none; padding: 0 1rem; flex-grow: 1; border-radius: 2rem; margin: 0.25rem; }
+        #input:focus { outline: none; }
+        #form > button { background: #333; border: none; padding: 0 1rem; margin: 0.25rem; border-radius: 3px; outline: none; color: #fff; }
+
+        #messages { list-style-type: none; margin: 0; padding: 0; }
+        #messages > li { padding: 0.5rem 1rem; }
+        #messages > li:nth-child(odd) { background: #efefef; }
+    </style>
+</head>
+
+<body>
+
+<div>
+    <ul id="messages"></ul>
+    <form id="form" action="">
+        <h3 id="label">Ожидайте вашей очереди</h3>
+        <input id="input" autocomplete="off" style="display: none"/>
+        <button id="send"  style="display: none">Send</button>
+    </form>
+</div>
+
+<script src="/socket.io/socket.io.js"></script>
+<script>
+    if(!localStorage.getItem('role')) {
+        window.location.href = '/';
+    }
+
+    var socket = io('', {query: 'name=' + localStorage.getItem('name')
+        + '&description=' + localStorage.getItem('description')
+        + '&role=' + localStorage.getItem('role')
+    });
+
+    var form = document.getElementById('form');
+    var input = document.getElementById('input');
+
+    form.addEventListener('submit', function(e) {
+        e.preventDefault();
+        if (input.value) {
+            socket.emit('chat message', input.value);
+            document.getElementById('input').style.display = 'none';
+            document.getElementById('send').style.display = 'none';
+            document.getElementById('label').style.display = 'block';
+
+            input.value = '';
+        }
+    });
+
+    socket.on('chat message', function(data) {
+        console.log('chat message', data);
+        // 'title': msg,
+        // 'type': userRole,
+        // 'name': для персонажа
+        // /*** информация об изменении в комнате ***/
+        // currentUserId: currentUserId,
+        // currentRole: currentRole
+        /*** Уведомление в чате ***/
+        {
+            let text = "";
+            if(data.type === 'character')  {
+                text = '<u>' + data.name + '</u> говорит: "' + data.title + '"';
+            } else {
+                text = " >> " + data.title;
+            }
+            let item = document.createElement('li');
+            item.innerHTML = text;
+            document.getElementById('messages').appendChild(item);
+            window.scrollTo(0, document.body.scrollHeight);
+        }
+        /*** Смена хода ***/
+        {
+            if(data.currentUserId === socket.id) {
+                document.getElementById('input').style.display = 'block';
+                document.getElementById('send').style.display = 'block';
+                document.getElementById('label').style.display = 'none';
+                console.log('Ваш ход');
+            }
+        }
+
+    });
+
+    socket.on('player connect', function(data) {
+        console.log('player connect', data);
+        if(data.currentUserId === socket.id) {
+            document.getElementById('input').style.display = 'block';
+            document.getElementById('send').style.display = 'block';
+            document.getElementById('label').style.display = 'none';
+            console.log('Ваш ход');
+        }
+
+        // /*** игрок приветствуется другими ***/
+        // userData: userData,
+        // /*** информация о комнате ***/
+        // currentUserId: currentUserId,
+        // currentRole: currentRole,
+        // narrators: narrators,
+        // characters: characters
+    });
+
+    socket.on('player disconnect', function(data) {
+        console.log('player disconnect', data);
+
+        if(data.currentUserId === socket.id) {
+            document.getElementById('input').style.display = 'block';
+            document.getElementById('send').style.display = 'block';
+            document.getElementById('label').style.display = 'none';
+            console.log('Ваш ход');
+
+        }
+        // /*** с игроком прощаются ***/
+        // userData: userData,
+        // /*** информация об изменении в комнате ***/
+        // currentUserId: currentUserId,
+        // currentRole: currentRole,
+        // narrators: narrators,
+        // characters: characters
+    });
+
+</script>
+
+
+</body>
+</html>

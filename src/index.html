@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="ru">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>Online Story Game</title>
+    <meta name="description" content="Online Story Game">
+    <meta name="author" content="kxo">
+
+    <meta property="og:title" content="Online Story Game">
+    <meta property="og:type" content="website">
+    <meta property="og:description" content="Online Story Game">
+
+</head>
+
+<body>
+    <div style="text-align: center">
+        <h1>STORY ONLINE</h1>
+    </div>
+    <div style="text-align: center; display: none" id="rules-block">
+        Добро пожаловать в виртуальный мир Online Story Game. Место где вы можете отлично провести время.
+        <h2>
+            Правила
+        </h2>
+        В этой игре Вы можете быть в роли <b>диктора</b> или <b>персонажа</b>.<br/>
+        <h3>Диктор</h3>
+        Задача диктора заключатся в том, чтобы описывать действия и ситуации происходящие в игре.<br/>
+        Например:<br/>
+        <pre>
+            Диктор: Солнце зашло, с юга подул слабый ветер
+        </pre>
+        или
+        <pre>
+            Диктор: <u>Стальная Мамба</u> вскочила в боевую стойку и делает меткий выстрел из лука прямо в тыкву.
+        </pre>
+        <h3>Персонаж</h3>
+        Персонажи разговаривают друг с другом, живут своей жизнью, владеют навыками, но не могут управлять своими действиями.<br/>
+        Например: <br/>
+        <pre>
+            <u>Смертельный Джон</u>: Какая прекрасная погода, самое время размять косточки.
+        </pre>
+        <br/>
+        Персонажи и дикторы ходят по очереди, таким образом создавая общую историю, например .... <br/>
+        <pre>
+            Диктор: Солнце зашло, с юга подул слабый ветер
+            <u>Смертельный Джон</u>: Какая прекрасная погода, самое время размять косточки.
+            Диктор: <u>Стальная Мамба</u> вскочила в боевую стойку и делает меткий выстрел из лука прямо в тыкву.
+            <u>Стальная Мамба</u>: Чтож, давай посмотрим на что ты способен!
+        </pre>
+    </div>
+    <div style="text-align: center">
+        <button
+            onclick="
+                document.getElementById('rules-block').style.display = 'block';
+                this.style.display  = 'none';
+
+            "
+        >Правила</button>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        <a href="/start_game">
+            <button>Играть</button>
+        </a>
+    </div>
+<!-- your content here... -->
+<!--<script src="js/scripts.js"></script>-->
+</body>
+</html>
