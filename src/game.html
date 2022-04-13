@@ -189,14 +189,8 @@
         }
     });
 
-    socket.on('chat message', function(data) {
-        console.log('chat message', data);
-        // 'title': msg,
-        // 'type': userRole,
-        // 'name': для персонажа
-        // /*** информация об изменении в комнате ***/
-        // currentUserId: currentUserId,
-        // currentRole: currentRole
+
+    function renderMessage(data){
         /*** Уведомление в чате ***/
         {
             let text = "";
@@ -210,6 +204,16 @@
             document.getElementById('messages').appendChild(item);
             window.scrollTo(0, document.body.scrollHeight);
         }
+    }
+    socket.on('chat message', function(data) {
+        console.log('chat message', data);
+        // 'title': msg,
+        // 'type': userRole,
+        // 'name': для персонажа
+        // /*** информация об изменении в комнате ***/
+        // currentUserId: currentUserId,
+        // currentRole: currentRole
+        renderMessage(data);
         /*** Смена хода ***/
         {
             if(data.currentUserId === socket.id) {
@@ -222,7 +226,11 @@
         updatePlayerList(data);
 
     });
-
+    socket.on('chat history', function(data) {
+        data.forEach(function (data){
+            renderMessage(data);
+        })
+    });
     socket.on('player connect', function(data) {
         console.log('player connect', data);
         if(data.currentUserId === socket.id) {

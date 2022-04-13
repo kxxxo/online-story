@@ -29,6 +29,7 @@ let narrators = [];
 let visitors = [];
 let currentRole = null;
 let currentUserId = null;
+let chatHistory = [];
 
 
 io.on('connection', (socket) => {
@@ -141,6 +142,10 @@ io.on('connection', (socket) => {
       if(userRole === 'character') {
         message.name = userData.name;
       }
+      chatHistory.push(message);
+      if(chatHistory.length > 50) {
+        chatHistory.shift();
+      }
 
       io.emit('chat message', message);
     }
@@ -155,5 +160,6 @@ io.on('connection', (socket) => {
     narrators: narrators,
     characters: characters
   });
+  io.to(userId).emit('chat history',chatHistory);
 
 });
