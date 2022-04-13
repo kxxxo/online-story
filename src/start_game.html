@@ -18,11 +18,18 @@
 
 <div style="text-align: center">
     <h2>Роль:</h2>
-    <input type="radio" id="role_type_narrator"
-       name="role" value="role_type_narrator" checked
+
+    <input type="radio" id="role_type_visitor"
+       name="role" value="role_type_visitor" checked
            onclick="document.getElementById('character_profile').style.display = 'none';"
     >
-    <label for="role_type_narrator">Диктор</label>
+    <label for="role_type_visitor">Зритель</label>
+
+    <input type="radio" id="role_type_narrator"
+           name="role" value="role_type_narrator" checked
+           onclick="document.getElementById('character_profile').style.display = 'none';"
+    >
+    <label for="role_type_narrator">Рассказчик</label>
 
     <input type="radio" id="role_type_character"
        name="role" value="role_type_character"
@@ -46,12 +53,16 @@
 <script>
     function startGame(){
         localStorage = window.localStorage;
-        if(!document.getElementById('role_type_narrator').checked) {
+        if(document.getElementById('role_type_character').checked) {
             let name = document.getElementById('name').value;
             let description = document.getElementById('description').value;
             localStorage.setItem('name',name);
             localStorage.setItem('description',description)
             localStorage.setItem('role', 'character')
+        } else if(document.getElementById('role_type_visitor').checked) {
+            localStorage.removeItem('name');
+            localStorage.removeItem('description');
+            localStorage.setItem('role', 'visitor')
         } else {
             localStorage.removeItem('name');
             localStorage.removeItem('description');

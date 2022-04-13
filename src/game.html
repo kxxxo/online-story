@@ -22,24 +22,151 @@
         #messages { list-style-type: none; margin: 0; padding: 0; }
         #messages > li { padding: 0.5rem 1rem; }
         #messages > li:nth-child(odd) { background: #efefef; }
+
+        #header {
+            background: #2e3944;
+            height: 64px;
+            line-height: 64px;
+            color: white;
+            display: flex;
+            flex-direction: row;
+            width: 100%;
+        }
+        .header-image {
+            height: 40px;
+            padding-top: 12px;
+        }
+        .header-avatar-image {
+            padding-left: 12px;
+            padding-right: 12px;
+            display: none;
+        }
+
+        #right-block {
+            display: none;
+            position: absolute;
+            right: 0;
+            top: 0;
+            height: 100%;
+            width: 100%;
+            background: rgba(0, 0, 0, 0.62);
+        }
+
+        #right-block > #right-block-content {
+            position: absolute;
+            right: 0;
+            height: 100%;
+            width: 300px;
+            max-width: 100%;
+            background: white;
+        }
+
+        #right-block-content-header {
+            width: 100%;
+            height: 64px;
+            line-height: 64px;
+            font-size: 24px;
+            background: #30569c;
+            color: white;
+        }
+
+        #right-block-content-list {
+            /*padding: 0; !* Remove padding *!*/
+            /*margin: 0; !* Remove margins *!*/
+        }
+        #right-block-content-list > li {
+            padding-bottom: 5px;
+        }
+        .list-active-item {
+            color: #30569c;
+            font-weight: bold;
+        }
+
+        #right-block-content-footer {
+            height: 64px;
+            width: 100%;
+            font-size: 24px;
+            background: #2e3944;
+            text-align: center;
+            line-height: 64px;
+            bottom: 0;
+            position: absolute;
+        }
+
+        #right-block-content-close {
+            color: white;
+            text-decoration: none;
+        }
+
+        #form-message {
+            line-height: 40px;
+            font-size: 19px;
+            font-weight: bold;
+            text-align: center;
+            width: 100%;
+        }
+
     </style>
 </head>
 
 <body>
 
-<div>
+<div id="header">
+        <img src="/images/narrator.png" id="header-narrator-image" class="header-image header-avatar-image"/>
+        <img src="/images/character.png" id="header-character-image" class="header-image header-avatar-image"/>
+        <img src="/images/visitor.png" id="header-visitor-image" class="header-image header-avatar-image"/>
+        <div class="header-title" id="header-character-title">
+        </div>
+        <a href="javascript:0" style="right: 48px; position: absolute" id="header-list-btn">
+            <img src="/images/list.png" class="header-image"/>
+        </a>
+        <a href="/" style="right: 10px; position: absolute">
+            <img src="/images/exit_white.png" class="header-image"/>
+        </a>
+</div>
+<div id="body">
     <ul id="messages"></ul>
     <form id="form" action="">
-        <h3 id="label">Ожидайте вашей очереди</h3>
+        <div id="form-message">Ожидайте вашей очереди</div>
         <input id="input" autocomplete="off" style="display: none"/>
-        <button id="send"  style="display: none">Send</button>
+        <button id="send"  style="display: none">Отправить</button>
     </form>
+</div>
+<div id="right-block">
+    <div id="right-block-content">
+        <div id="right-block-content-header">
+            &nbsp;&nbsp;&nbsp;&nbsp;Участники:
+        </div>
+        <ol id="right-block-content-list">
+        </ol>
+        <a href="javascript:null" id="right-block-content-close">
+            <div id="right-block-content-footer">
+                Закрыть
+            </div>
+        </a>
+    </div>
 </div>
 
 <script src="/socket.io/socket.io.js"></script>
 <script>
     if(!localStorage.getItem('role')) {
         window.location.href = '/';
+    } else {
+        switch (localStorage.getItem('role')) {
+            case 'narrator':
+                document.getElementById('header-narrator-image').style.display = 'block';
+                document.getElementById('header-character-title').innerText = 'Рассказчик';
+                break;
+            case 'character':
+                document.getElementById('header-character-image').style.display = 'block';
+                document.getElementById('header-character-title').innerText = localStorage.getItem('name');
+                break;
+            case 'visitor':
+                document.getElementById('header-visitor-image').style.display = 'block';
+                document.getElementById('header-character-title').innerText = 'Зритель';
+
+                break;
+        }
     }
 
     var socket = io('', {query: 'name=' + localStorage.getItem('name')
@@ -47,8 +174,8 @@
         + '&role=' + localStorage.getItem('role')
     });
 
-    var form = document.getElementById('form');
-    var input = document.getElementById('input');
+    const form = document.getElementById('form');
+    const input = document.getElementById('input');
 
     form.addEventListener('submit', function(e) {
         e.preventDefault();
@@ -56,7 +183,7 @@
             socket.emit('chat message', input.value);
             document.getElementById('input').style.display = 'none';
             document.getElementById('send').style.display = 'none';
-            document.getElementById('label').style.display = 'block';
+            document.getElementById('form-message').style.display = 'block';
 
             input.value = '';
         }
@@ -88,10 +215,11 @@
             if(data.currentUserId === socket.id) {
                 document.getElementById('input').style.display = 'block';
                 document.getElementById('send').style.display = 'block';
-                document.getElementById('label').style.display = 'none';
+                document.getElementById('form-message').style.display = 'none';
                 console.log('Ваш ход');
             }
         }
+        updatePlayerList(data);
 
     });
 
@@ -100,10 +228,10 @@
         if(data.currentUserId === socket.id) {
             document.getElementById('input').style.display = 'block';
             document.getElementById('send').style.display = 'block';
-            document.getElementById('label').style.display = 'none';
-            console.log('Ваш ход');
+            document.getElementById('form-message').style.display = 'none';
         }
 
+        updatePlayerList(data);
         // /*** игрок приветствуется другими ***/
         // userData: userData,
         // /*** информация о комнате ***/
@@ -113,16 +241,51 @@
         // characters: characters
     });
 
+    function updatePlayerList(data) {
+        let playerList = [];
+        for(let i =0; i < Math.max(data.narrators.length,data.characters.length); i++) {
+            let narrator = data.narrators[i % Math.max(data.narrators.length,data.characters.length)];
+            let character = data.characters[i % Math.max(data.narrators.length,data.characters.length)];
+
+            if(data.currentRole === 'character') {
+                if(character)
+                    playerList.push( character );
+                if(narrator)
+                    playerList.push( narrator);
+            } else {
+                if(narrator)
+                    playerList.push( narrator);
+                if(character)
+                    playerList.push( character );
+            }
+        }
+
+        let htmlList = document.getElementById('right-block-content-list');
+        htmlList.innerHTML = "";
+        playerList.forEach(function(data,index) {
+            let li = document.createElement("li");
+            if(data.userRole === 'character') {
+                li.innerText = data.name;
+            } else {
+                li.innerText = 'Рассказчик';
+            }
+            if(data.userId === socket.id) {
+                li.setAttribute("class", "list-active-item");
+            }
+            htmlList.appendChild(li);
+        });
+    }
+
     socket.on('player disconnect', function(data) {
         console.log('player disconnect', data);
 
         if(data.currentUserId === socket.id) {
             document.getElementById('input').style.display = 'block';
             document.getElementById('send').style.display = 'block';
-            document.getElementById('label').style.display = 'none';
+            document.getElementById('form-message').style.display = 'none';
             console.log('Ваш ход');
-
         }
+        updatePlayerList(data);
         // /*** с игроком прощаются ***/
         // userData: userData,
         // /*** информация об изменении в комнате ***/
@@ -131,6 +294,30 @@
         // narrators: narrators,
         // characters: characters
     });
+
+
+
+    const rightBlock = document.getElementById('right-block')
+    rightBlock.addEventListener('click', function (e){
+        if (e.target !== this) {
+            return;
+        }
+        rightBlock.style.display = 'none';
+    });
+
+    const headerListBtn = document.getElementById('header-list-btn')
+    headerListBtn.addEventListener('click', function (e){
+        rightBlock.style.display = 'block';
+    });
+
+
+    const rightBlockContentClose = document.getElementById('right-block-content-close')
+    rightBlockContentClose.addEventListener('click', function (e){
+        rightBlock.style.display = 'none';
+    });
+
+
+
 
 </script>
 

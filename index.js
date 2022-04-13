@@ -17,6 +17,8 @@ app.get('/game', (req, res) => {
   res.sendFile(__dirname + '/src/game.html');
 });
 
+app.use(express.static('public'));
+
 
 server.listen(3000, () => {
   console.log('listening on *:3000');
@@ -127,7 +129,9 @@ io.on('connection', (socket) => {
         'type': userRole,
         /*** информация об изменении в комнате ***/
         currentUserId: currentUserId,
-        currentRole: currentRole
+        currentRole: currentRole,
+        narrators: narrators,
+        characters: characters
       };
       if(userRole === 'character') {
         message.name = userData.name;
@@ -146,5 +150,7 @@ io.on('connection', (socket) => {
     narrators: narrators,
     characters: characters
   });
+
+
 
 });
