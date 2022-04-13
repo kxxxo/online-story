@@ -26,6 +26,7 @@ server.listen(3000, () => {
 
 let characters = [];
 let narrators = [];
+let visitors = [];
 let currentRole = null;
 let currentUserId = null;
 
@@ -55,11 +56,13 @@ io.on('connection', (socket) => {
       description: socket.handshake.query.description
     };
     characters.push(userData);
-  } else {
+  } else if(socket.handshake.query.role === 'narrator') {
     userData = {
       userId: userId,
     };
     narrators.push(userData);
+  } else {
+    visitors.push(userData);
   }
 
   socket.on('disconnect', () => {
@@ -73,16 +76,17 @@ io.on('connection', (socket) => {
         }
       }
       characters = characters.filter(e => e.userId !== userId);
-    } else {
+    } else if(userRole === 'narrator') {
       if(currentUserId === userId) {
         if(narrators.length > 1) {
           nextUserData = narrators[
-            narrators.map(e => e.userId).indexOf(userId) + 1 % narrators.length
-          ];
+          narrators.map(e => e.userId).indexOf(userId) + 1 % narrators.length
+              ];
         }
-
       }
       narrators = narrators.filter(e => e.userId !== userId);
+    } else {
+      visitors = visitors.filter(e => e.userId !== userId);
     }
 
     if(nextUserData) {
@@ -112,11 +116,12 @@ io.on('connection', (socket) => {
         currentRole = 'narrator'
         nextUser = narrators[0];
         characters.push(characters.shift())
-      } else {
+      } else if(currentRole === 'narrator') {
         currentRole = 'character';
         nextUser = characters[0];
         narrators.push(narrators.shift())
       }
+
       /*** Передаем сообщение следующему пользователю ***/
       if(nextUser) {
         currentUserId = nextUser.userId;
@@ -150,7 +155,5 @@ io.on('connection', (socket) => {
     narrators: narrators,
     characters: characters
   });
-
-
 
 });
